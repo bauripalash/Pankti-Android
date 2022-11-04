@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SatCat</string>
+    <string name="app_name">Pankti</string>
     <string name="code_input_hint">Write code…</string>
     <string name="code_output_hint">[Output]</string>
 </resources>

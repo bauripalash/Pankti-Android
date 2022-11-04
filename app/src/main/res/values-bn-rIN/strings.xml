@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pankti</string>
+    <string name="code_input_hint">"পংতি লেখুন"</string>
+    <string name="code_output_hint">[ফলাফল]</string>
+</resources>
