@@ -1,6 +1,8 @@
 package bauri.palash.panktimob.views
 
+import android.graphics.drawable.shapes.Shape
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
@@ -12,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
@@ -42,8 +45,12 @@ fun Drawer(
     ModalNavigationDrawer(
         drawerState = dState,
         drawerContent = {
+
             ModalDrawerSheet() {
 
+                Card(shape = RoundedCornerShape(16F)) {
+                    Text(text = "PANKTI")
+                }
                 Spacer(modifier = Modifier.height(12.dp))
                 //dItems.forEach { item ->
                     NavigationDrawerItem(label = { Text("Editor") },
@@ -63,7 +70,7 @@ fun Drawer(
                         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                         icon = { Icon(Icons.Default.List, contentDescription = null) }
                     )
-
+                Spacer(modifier = Modifier.height(12.dp))
                 NavigationDrawerItem(label = { Text("Repl") },
 
 

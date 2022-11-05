@@ -27,7 +27,7 @@ fun EditorFragment(scope: CoroutineScope, dState: DrawerState){
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally) {
             TopMenu(scope, dState )
-            EditorScreen("Mango")
+            EditorView()
         }
 
     }
