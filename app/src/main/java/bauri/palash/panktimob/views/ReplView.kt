@@ -114,7 +114,7 @@ fun codeOutput() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun topMenu(scope: CoroutineScope, dState: DrawerState) {
+fun TopMenu(scope: CoroutineScope, dState: DrawerState) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         IconButton(
             onClick = {
@@ -140,24 +140,26 @@ fun topMenu(scope: CoroutineScope, dState: DrawerState) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Repl(scope: CoroutineScope, dState: DrawerState) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
 
-    ) {
-        topMenu(scope, dState)
-        Spacer(modifier = Modifier.size(5.dp))
-        codeInput()
-        Spacer(modifier = Modifier.size(5.dp))
+        ) {
+            TopMenu(scope, dState)
+            Spacer(modifier = Modifier.size(5.dp))
+            codeInput()
+            Spacer(modifier = Modifier.size(5.dp))
 
-        runButton()
-        Spacer(modifier = Modifier.size(5.dp))
-        codeOutput()
+            runButton()
+            Spacer(modifier = Modifier.size(5.dp))
+            codeOutput()
+        }
     }
+
 
 }
 

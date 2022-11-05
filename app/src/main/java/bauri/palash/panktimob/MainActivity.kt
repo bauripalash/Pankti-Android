@@ -15,10 +15,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 
 import bauri.palash.panktimob.ui.theme.PanktiMobTheme
 import bauri.palash.panktimob.views.Drawer
-import bauri.palash.panktimob.views.Repl
 
 
 class MainActivity : ComponentActivity() {
@@ -53,6 +53,7 @@ fun MainView() {
     val dState = rememberDrawerState(initialValue = DrawerValue.Closed)
     //Repl()
     Drawer(scope = dScope, dState = dState)
+
 }
 
 
