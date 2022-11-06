@@ -9,10 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +25,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun runButton() {
+fun runButton(clicked : () -> Unit) {
 
     val btn_bg = SolidColor(Color(R.color.white))
     Column(
@@ -38,7 +35,7 @@ fun runButton() {
 
     ) {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { clicked() },
             modifier = Modifier.fillMaxWidth(),
             enabled = true,
             border = BorderStroke(width = 1.dp, brush = btn_bg),
@@ -51,66 +48,6 @@ fun runButton() {
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun codeInput() {
-    val textval = remember {
-        mutableStateOf(TextFieldValue(""))
-    }
-    val scrollVal = rememberScrollState(0)
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(550.dp)
-            .verticalScroll(scrollVal),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        OutlinedTextField(
-            value = textval.value,
-            onValueChange = { textval.value = it },
-            placeholder = {
-                Text(
-                    text = stringResource(id = R.string.code_input_hint)
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .height(550.dp))
-
-
-    }
-
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun codeOutput() {
-    val outval = remember {
-        mutableStateOf(TextFieldValue(""))
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        OutlinedTextField(
-            value = outval.value, onValueChange = { outval.value = it },
-            placeholder = { Text(text = stringResource(id = R.string.code_output_hint)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .height(200.dp)
-        )
-
-    }
-
-
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,9 +74,30 @@ fun TopMenu(scope: CoroutineScope, dState: DrawerState) {
     }
 }
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Repl(scope: CoroutineScope, dState: DrawerState) {
+    var inputValue by remember {
+        mutableStateOf(TextFieldValue(""))
+    }
+    var resultValue by remember {
+        mutableStateOf(TextFieldValue(""))
+    }
+
+
+
+    //val inputValue = mutableStateOf(TextFieldValue(""))
+    //resultValue = TextFieldValue
+
+    val clickedRun = {
+        println("Button Clicked!")
+        resultValue = inputValue
+    }
+
+
+
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -151,12 +109,49 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
         ) {
             TopMenu(scope, dState)
             Spacer(modifier = Modifier.size(5.dp))
-            codeInput()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(550.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = inputValue,
+                    onValueChange = {inputValue = it},
+                    placeholder = {
+                        Text(
+                            text = stringResource(id = R.string.code_input_hint)
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .height(550.dp))
+
+
+            }
             Spacer(modifier = Modifier.size(5.dp))
 
-            runButton()
+            runButton(clickedRun)
             Spacer(modifier = Modifier.size(5.dp))
-            codeOutput()
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = resultValue, onValueChange = { resultValue = it },
+                    placeholder = { Text(text = stringResource(id = R.string.code_output_hint)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .height(200.dp)
+                )
+
+            }
         }
     }
 
@@ -169,26 +164,6 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
 fun DefaultPreview() {
     PanktiMobTheme {
 
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-
-        ) {
-            /*topMenu()*/
-            Spacer(modifier = Modifier.size(5.dp))
-            codeInput()
-            Spacer(modifier = Modifier.size(5.dp))
-
-            runButton()
-            Spacer(modifier = Modifier.size(5.dp))
-            codeOutput()
-
-
-        }
+        //Repl(scope =, dState =  DrawerState())
     }
 }
