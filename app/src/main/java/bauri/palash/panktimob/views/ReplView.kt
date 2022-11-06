@@ -22,6 +22,7 @@ import bauri.palash.panktimob.R
 import bauri.palash.panktimob.ui.theme.PanktiMobTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import androidapi.Androidapi.doParse
 
 
 @Composable
@@ -93,7 +94,8 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
 
     val clickedRun = {
         println("Button Clicked!")
-        resultValue = inputValue
+        val pd = doParse(inputValue.text)
+        resultValue = TextFieldValue(pd)
     }
 
 
@@ -109,6 +111,8 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
         ) {
             TopMenu(scope, dState)
             Spacer(modifier = Modifier.size(5.dp))
+
+            // Code Input
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -118,7 +122,7 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
             ) {
                 OutlinedTextField(
                     value = inputValue,
-                    onValueChange = {inputValue = it},
+                    onValueChange = { inputValue = it },
                     placeholder = {
                         Text(
                             text = stringResource(id = R.string.code_input_hint)
@@ -127,7 +131,8 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()
-                        .height(550.dp))
+                        .height(550.dp)
+                )
 
 
             }
@@ -135,6 +140,8 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
 
             runButton(clickedRun)
             Spacer(modifier = Modifier.size(5.dp))
+
+            //Code Output / Result
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

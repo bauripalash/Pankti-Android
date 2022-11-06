@@ -1,0 +1,3 @@
+[submodule "pankti"]
+	path = pankti
+	url = git@github.com:bauripalash/pankti.git
