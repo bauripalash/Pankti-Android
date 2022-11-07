@@ -1,5 +1,6 @@
 package bauri.palash.panktimob.views
 
+import android.widget.Scroller
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +24,22 @@ import bauri.palash.panktimob.ui.theme.PanktiMobTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import androidapi.Androidapi.doParse
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
+import bauri.palash.panktimob.ui.theme.NotoBengali
 
 
 @Composable
@@ -79,6 +96,79 @@ fun TopMenu(scope: CoroutineScope, dState: DrawerState) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun CodeInput( onChanged : (text : String) -> Unit ){
+    var inputValue by remember {
+        mutableStateOf(TextFieldValue(""))
+    }
+
+    var lState = rememberLazyListState()
+
+    var sState = rememberScrollState(0) //Scroll State for TextField
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            //.heightIn(550.dp , 550.dp)
+            .height(550.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        OutlinedTextField(
+            textStyle = TextStyle(fontFamily = NotoBengali),
+            value = inputValue,
+            onValueChange = {
+                                inputValue = it
+
+                                onChanged(inputValue.text)
+
+                            },
+            placeholder = {
+                Text(
+                    text = stringResource(id = R.string.code_input_hint)
+                )
+            },
+
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .height(550.dp)
+                .heightIn(550.dp, 550.dp)
+
+
+                //.verticalScroll(sState , enabled = true)
+                //.scrollable(state = sState, orientation = Orientation.Vertical)
+        )
+
+
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CodeOutput( resultValue : TextFieldValue ){
+    var sState = rememberScrollState(0) //Scroll State for Output
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(350.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        OutlinedTextField(
+            value = resultValue, onValueChange = { /* No Need of anything here, I guess*/ },
+            placeholder = { Text(text = stringResource(id = R.string.code_output_hint)) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .height(350.dp)
+                .verticalScroll(sState, enabled = true)
+        )
+
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun Repl(scope: CoroutineScope, dState: DrawerState) {
     var inputValue by remember {
         mutableStateOf(TextFieldValue(""))
@@ -87,10 +177,10 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
         mutableStateOf(TextFieldValue(""))
     }
 
+    val InputChanged : (value : String) -> Unit = {
+        inputValue = TextFieldValue(it)
+    }
 
-
-    //val inputValue = mutableStateOf(TextFieldValue(""))
-    //resultValue = TextFieldValue
 
     val clickedRun = {
         println("Button Clicked!")
@@ -113,52 +203,15 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
             Spacer(modifier = Modifier.size(5.dp))
 
             // Code Input
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(550.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                OutlinedTextField(
-                    value = inputValue,
-                    onValueChange = { inputValue = it },
-                    placeholder = {
-                        Text(
-                            text = stringResource(id = R.string.code_input_hint)
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .height(550.dp)
-                )
+            CodeInput(onChanged = InputChanged)
 
-
-            }
             Spacer(modifier = Modifier.size(5.dp))
 
             runButton(clickedRun)
             Spacer(modifier = Modifier.size(5.dp))
 
             //Code Output / Result
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                OutlinedTextField(
-                    value = resultValue, onValueChange = { resultValue = it },
-                    placeholder = { Text(text = stringResource(id = R.string.code_output_hint)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .height(200.dp)
-                )
-
-            }
+            CodeOutput(resultValue = resultValue)
         }
     }
 
@@ -166,11 +219,13 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     PanktiMobTheme {
+        val tempScope = rememberCoroutineScope()
+        val tempDState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-        //Repl(scope =, dState =  DrawerState())
+        Repl(tempScope , tempDState)
     }
 }
