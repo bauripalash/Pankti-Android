@@ -12,6 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SatCat"
         tools:targetApi="31">
+
         <activity
             android:name="bauri.palash.panktimob.MainActivity"
             android:exported="true"
@@ -24,5 +25,7 @@
             </intent-filter>
         </activity>
     </application>
+
+
 
 </manifest>

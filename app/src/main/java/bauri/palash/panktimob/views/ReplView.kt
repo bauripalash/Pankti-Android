@@ -1,5 +1,6 @@
 package bauri.palash.panktimob.views
 
+import android.content.Context
 import android.widget.Scroller
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
@@ -23,27 +24,33 @@ import bauri.palash.panktimob.R
 import bauri.palash.panktimob.ui.theme.PanktiMobTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import androidapi.Androidapi.doParse
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.lazy.LazyListState
+import `in`.palashbauri.panktijapi.androidapi.Androidapi.doParse
+import android.Manifest
+import android.app.Activity
+import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+
+
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.ui.composed
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.Dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+
+import bauri.palash.panktimob.readFromCache
+
+import bauri.palash.panktimob.saveToCache
 import bauri.palash.panktimob.ui.theme.NotoBengali
 
+const val WTES_PERMISSION = 0 //Write to External Storage
 
 @Composable
 fun runButton(clicked : () -> Unit) {
+
 
     val btn_bg = SolidColor(Color(R.color.white))
     Column(
@@ -99,6 +106,17 @@ fun TopMenu(scope: CoroutineScope, dState: DrawerState) {
 fun CodeInput( onChanged : (text : String) -> Unit ){
     var inputValue by remember {
         mutableStateOf(TextFieldValue(""))
+    }
+
+    var isNew by remember {
+        mutableStateOf(true)
+    }
+
+
+    if (isNew){
+        inputValue = TextFieldValue(readFromCache(LocalContext.current))
+        onChanged(inputValue.text)
+        isNew = false
     }
 
     var lState = rememberLazyListState()
@@ -166,13 +184,34 @@ fun CodeOutput( resultValue : TextFieldValue ){
     }
 }
 
+fun reqP(){
+    println()
+}
+
+fun checkAndGetExternal( appCon: Context , permission : String,
+    launcher : ManagedActivityResultLauncher<String , Boolean>){
+    val permCheckRes = ContextCompat.checkSelfPermission(appCon ,permission)
+    if (permCheckRes == PackageManager.PERMISSION_GRANTED){
+        println("Got Permission")
+    }else{
+        launcher.launch(permission)
+    }
+}
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Repl(scope: CoroutineScope, dState: DrawerState) {
+
+
+
+    val thisContext = LocalContext.current
     var inputValue by remember {
         mutableStateOf(TextFieldValue(""))
     }
+
+
     var resultValue by remember {
         mutableStateOf(TextFieldValue(""))
     }
@@ -181,11 +220,31 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
         inputValue = TextFieldValue(it)
     }
 
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()) { isG ->
+
+            if (isG){
+                println("Has Permission for camera XYZ")
+            }else{
+                println("No permission")
+
+            }
+
+    }
+
 
     val clickedRun = {
-        println("Button Clicked!")
+        //println("Button Clicked!")
+
+        //checkAndGetExternal(thisContext , Manifest.permission.CAMERA , launcher)
+        //launcher.launch(Manifest.permission.CAMERA)
+        saveToCache(thisContext , inputValue.text)
         val pd = doParse(inputValue.text)
         resultValue = TextFieldValue(pd)
+
+        println(readFromCache(thisContext))
+
+
     }
 
 
