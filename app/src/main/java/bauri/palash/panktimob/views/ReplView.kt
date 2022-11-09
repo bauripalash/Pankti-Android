@@ -1,7 +1,7 @@
 package bauri.palash.panktimob.views
 
-import android.content.Context
-import android.widget.Scroller
+
+import `in`.palashbauri.panktijapi.androidapi.Androidapi.doParse
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,43 +16,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import bauri.palash.panktimob.R
+import bauri.palash.panktimob.readFromCache
+import bauri.palash.panktimob.saveToCache
+import bauri.palash.panktimob.ui.theme.NotoBengali
 import bauri.palash.panktimob.ui.theme.PanktiMobTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import `in`.palashbauri.panktijapi.androidapi.Androidapi.doParse
-import android.Manifest
-import android.app.Activity
-import android.content.pm.ActivityInfo
-import android.content.pm.PackageManager
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 
-
-import androidx.compose.foundation.lazy.rememberLazyListState
-
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-
-import bauri.palash.panktimob.readFromCache
-
-import bauri.palash.panktimob.saveToCache
-import bauri.palash.panktimob.ui.theme.NotoBengali
-
-const val WTES_PERMISSION = 0 //Write to External Storage
+const val CACHE_FILE_NAME = "replcache.txt"
 
 @Composable
-fun runButton(clicked : () -> Unit) {
+fun RunButton(clicked: () -> Unit) {
 
 
-    val btn_bg = SolidColor(Color(R.color.white))
+    val btnBg = SolidColor(Color(R.color.white))
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
@@ -63,7 +47,7 @@ fun runButton(clicked : () -> Unit) {
             onClick = { clicked() },
             modifier = Modifier.fillMaxWidth(),
             enabled = true,
-            border = BorderStroke(width = 1.dp, brush = btn_bg),
+            border = BorderStroke(width = 1.dp, brush = btnBg),
             shape = RoundedCornerShape(10.dp)
 
         ) {
@@ -100,10 +84,9 @@ fun TopMenu(scope: CoroutineScope, dState: DrawerState) {
 }
 
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodeInput( onChanged : (text : String) -> Unit ){
+fun CodeInput(onChanged: (text: String) -> Unit) {
     var inputValue by remember {
         mutableStateOf(TextFieldValue(""))
     }
@@ -113,15 +96,12 @@ fun CodeInput( onChanged : (text : String) -> Unit ){
     }
 
 
-    if (isNew){
-        inputValue = TextFieldValue(readFromCache(LocalContext.current))
+    if (isNew) {
+        inputValue = TextFieldValue(readFromCache(LocalContext.current, CACHE_FILE_NAME))
         onChanged(inputValue.text)
         isNew = false
     }
 
-    var lState = rememberLazyListState()
-
-    var sState = rememberScrollState(0) //Scroll State for TextField
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -134,11 +114,11 @@ fun CodeInput( onChanged : (text : String) -> Unit ){
             textStyle = TextStyle(fontFamily = NotoBengali),
             value = inputValue,
             onValueChange = {
-                                inputValue = it
+                inputValue = it
 
-                                onChanged(inputValue.text)
+                onChanged(inputValue.text)
 
-                            },
+            },
             placeholder = {
                 Text(
                     text = stringResource(id = R.string.code_input_hint)
@@ -152,8 +132,8 @@ fun CodeInput( onChanged : (text : String) -> Unit ){
                 .heightIn(550.dp, 550.dp)
 
 
-                //.verticalScroll(sState , enabled = true)
-                //.scrollable(state = sState, orientation = Orientation.Vertical)
+            //.verticalScroll(sState , enabled = true)
+            //.scrollable(state = sState, orientation = Orientation.Vertical)
         )
 
 
@@ -162,8 +142,8 @@ fun CodeInput( onChanged : (text : String) -> Unit ){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodeOutput( resultValue : TextFieldValue ){
-    var sState = rememberScrollState(0) //Scroll State for Output
+fun CodeOutput(resultValue: TextFieldValue) {
+    val sState = rememberScrollState(0) //Scroll State for Output
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -184,26 +164,9 @@ fun CodeOutput( resultValue : TextFieldValue ){
     }
 }
 
-fun reqP(){
-    println()
-}
-
-fun checkAndGetExternal( appCon: Context , permission : String,
-    launcher : ManagedActivityResultLauncher<String , Boolean>){
-    val permCheckRes = ContextCompat.checkSelfPermission(appCon ,permission)
-    if (permCheckRes == PackageManager.PERMISSION_GRANTED){
-        println("Got Permission")
-    }else{
-        launcher.launch(permission)
-    }
-}
-
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Repl(scope: CoroutineScope, dState: DrawerState) {
-
 
 
     val thisContext = LocalContext.current
@@ -216,20 +179,8 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
         mutableStateOf(TextFieldValue(""))
     }
 
-    val InputChanged : (value : String) -> Unit = {
+    val inputChanged: (value: String) -> Unit = {
         inputValue = TextFieldValue(it)
-    }
-
-    val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()) { isG ->
-
-            if (isG){
-                println("Has Permission for camera XYZ")
-            }else{
-                println("No permission")
-
-            }
-
     }
 
 
@@ -238,11 +189,11 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
 
         //checkAndGetExternal(thisContext , Manifest.permission.CAMERA , launcher)
         //launcher.launch(Manifest.permission.CAMERA)
-        saveToCache(thisContext , inputValue.text)
+        saveToCache(thisContext, CACHE_FILE_NAME, inputValue.text)
         val pd = doParse(inputValue.text)
         resultValue = TextFieldValue(pd)
 
-        println(readFromCache(thisContext))
+        println(readFromCache(thisContext, CACHE_FILE_NAME))
 
 
     }
@@ -262,11 +213,11 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
             Spacer(modifier = Modifier.size(5.dp))
 
             // Code Input
-            CodeInput(onChanged = InputChanged)
+            CodeInput(onChanged = inputChanged)
 
             Spacer(modifier = Modifier.size(5.dp))
 
-            runButton(clickedRun)
+            RunButton(clickedRun)
             Spacer(modifier = Modifier.size(5.dp))
 
             //Code Output / Result
@@ -285,6 +236,6 @@ fun DefaultPreview() {
         val tempScope = rememberCoroutineScope()
         val tempDState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-        Repl(tempScope , tempDState)
+        Repl(tempScope, tempDState)
     }
 }

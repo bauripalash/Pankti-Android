@@ -1,22 +1,15 @@
 package bauri.palash.panktimob
 
-import android.os.Bundle
 
+import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-
 import androidx.compose.foundation.layout.*
-
-
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-
 import androidx.compose.ui.Modifier
-
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
-
 import bauri.palash.panktimob.ui.theme.PanktiMobTheme
 import bauri.palash.panktimob.views.Drawer
 
@@ -63,6 +56,6 @@ fun DefaultPreview() {
     PanktiMobTheme {
 
 
-      MainView()
+        MainView()
     }
 }

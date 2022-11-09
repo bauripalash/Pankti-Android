@@ -1,6 +1,5 @@
 package bauri.palash.panktimob.views
 
-import android.graphics.drawable.shapes.Shape
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -12,9 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
@@ -46,30 +43,30 @@ fun Drawer(
         drawerState = dState,
         drawerContent = {
 
-            ModalDrawerSheet() {
+            ModalDrawerSheet {
 
                 Card(shape = RoundedCornerShape(16F)) {
                     Text(text = "PANKTI")
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 //dItems.forEach { item ->
-                    NavigationDrawerItem(label = { Text("Editor") },
+                NavigationDrawerItem(label = { Text("Editor") },
 
 
-                        selected = false,
-                        onClick = {
-                            scope.launch { dState.close() }
-                            navCtrl.navigate("Editor" ){
-                                popUpTo(navCtrl.graph.startDestDisplayName)
-                                //launchSingleTop = true
-                            }
+                    selected = false,
+                    onClick = {
+                        scope.launch { dState.close() }
+                        navCtrl.navigate("Editor") {
+                            popUpTo(navCtrl.graph.startDestDisplayName)
+                            //launchSingleTop = true
+                        }
 
 
-                            //selItem.value =
-                        },
-                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                        icon = { Icon(Icons.Default.List, contentDescription = null) }
-                    )
+                        //selItem.value =
+                    },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                    icon = { Icon(Icons.Default.List, contentDescription = null) }
+                )
                 Spacer(modifier = Modifier.height(12.dp))
                 NavigationDrawerItem(label = { Text("Repl") },
 
@@ -77,7 +74,7 @@ fun Drawer(
                     selected = false,
                     onClick = {
                         scope.launch { dState.close() }
-                        navCtrl.navigate("Repl" ){
+                        navCtrl.navigate("Repl") {
                             popUpTo(navCtrl.graph.startDestDisplayName)
                             //launchSingleTop(true)
                         }
@@ -93,12 +90,12 @@ fun Drawer(
         },
         content = {
             //TopMenu(scope, dState )
-            NavHost(navController = navCtrl, startDestination = Route.Repl.route ){
-                composable(route = Route.Repl.route){
-                    Repl(scope = scope, dState =dState )
+            NavHost(navController = navCtrl, startDestination = Route.Repl.route) {
+                composable(route = Route.Repl.route) {
+                    Repl(scope = scope, dState = dState)
                 }
-                composable(route = Route.Editor.route){
-                    EditorFragment(scope , dState)
+                composable(route = Route.Editor.route) {
+                    EditorFragment(scope, dState)
                 }
             }
         }

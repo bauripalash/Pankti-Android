@@ -9,10 +9,11 @@ import androidx.compose.ui.unit.sp
 import bauri.palash.panktimob.R
 
 val NotoBengali = FontFamily(
-    Font(R.font.noto_serif_bengali_regular , FontWeight.Normal),
-    Font(R.font.noto_serif_bengali_bold , FontWeight.Bold),
-    Font(R.font.noto_serif_bengali_thin , FontWeight.Thin)
+    Font(R.font.noto_serif_bengali_regular, FontWeight.Normal),
+    Font(R.font.noto_serif_bengali_bold, FontWeight.Bold),
+    Font(R.font.noto_serif_bengali_thin, FontWeight.Thin)
 )
+
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(

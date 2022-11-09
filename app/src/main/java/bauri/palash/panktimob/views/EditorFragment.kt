@@ -16,17 +16,19 @@ import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorFragment(scope: CoroutineScope, dState: DrawerState){
+fun EditorFragment(scope: CoroutineScope, dState: DrawerState) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            TopMenu(scope, dState )
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            TopMenu(scope, dState)
             EditorView()
         }
 
