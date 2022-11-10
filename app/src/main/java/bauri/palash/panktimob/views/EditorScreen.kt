@@ -2,6 +2,12 @@ package bauri.palash.panktimob.views
 
 import `in`.palashbauri.panktijapi.androidapi.Androidapi.doParse
 import android.annotation.SuppressLint
+import android.content.Context
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
@@ -22,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import bauri.palash.panktimob.R
 import bauri.palash.panktimob.readFromCache
 import bauri.palash.panktimob.saveToCache
+import java.io.FileOutputStream
 
 const val EDITOR_CACHE = "editorcache.txt"
 
@@ -114,6 +121,29 @@ fun OpenButton(clicked: () -> Unit, modifier: Modifier) {
     }
 }
 
+private fun showToastError(appCon: Context, msg: String) {
+    Toast.makeText(appCon, msg, Toast.LENGTH_LONG).show()
+}
+
+fun createFile(appCon: Context, uri: String, data: String) {
+    Log.d("createFILE", uri)
+    val filePath = Uri.parse(uri)
+    //val fileObject = filePath.path?.let { File(it) }
+    try {
+
+        val parcelFileDescriptor = appCon.contentResolver.openFileDescriptor(filePath, "rw")
+
+        val fileOutputStream = FileOutputStream(parcelFileDescriptor?.fileDescriptor)
+
+        fileOutputStream.write(data.toByteArray())
+        fileOutputStream.close()
+        parcelFileDescriptor?.close()
+    } catch (e: java.lang.Exception) {
+        //e.printStackTrace()
+        showToastError(appCon, "Failed to Save file $uri")
+    }
+
+}
 
 @Composable
 fun EditorWriteScreen(navController: NavHostController) {
@@ -130,12 +160,30 @@ fun EditorWriteScreen(navController: NavHostController) {
     }
 
     val thisContext = LocalContext.current
+    //ActivityResultContracts.CreateDocument
+    var xVal by remember {
+        mutableStateOf("")
+    }
+    val aLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/plain"),
+        onResult = {
+            createFile(thisContext, it.toString(), inputValue.text)
+        })
     val runClicked = {
         //SaveToTempEditorFile(thisContext , inputValue.text)
         saveToCache(thisContext, EDITOR_CACHE, inputValue.text)
         val pd = doParse(inputValue.text)
 
         resultValue = TextFieldValue(pd)
+
+    }
+
+    val saveClicked = {
+        try {
+            aLauncher.launch("source.pank")
+        } catch (e: Exception) {
+            showToastError(thisContext, "Failed to save File")
+        }
     }
 
 
@@ -144,7 +192,7 @@ fun EditorWriteScreen(navController: NavHostController) {
         Row(modifier = Modifier.fillMaxWidth()) {
 
             RunButton(clicked = runClicked, modifier = Modifier.weight(0.4F))
-            SaveButton(clicked = runClicked, modifier = Modifier.weight(0.4F))
+            SaveButton(clicked = saveClicked, modifier = Modifier.weight(0.4F))
             OpenButton(clicked = runClicked, modifier = Modifier.weight(0.4F))
 
         }
