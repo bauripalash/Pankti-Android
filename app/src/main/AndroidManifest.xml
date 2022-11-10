@@ -16,7 +16,6 @@
         <activity
             android:name="in.palashbauri.panktimob.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.SatCat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -23,11 +23,7 @@ val Typography = Typography(
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     ),
-    bodyMedium = TextStyle(
-        fontFamily = NotoBengali,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp
-    )
+  
     /* Other default text styles to override
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
