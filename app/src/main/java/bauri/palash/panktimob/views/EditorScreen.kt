@@ -40,7 +40,6 @@ sealed class EditorScreenItems(var title: String, var route: String) {
 }
 
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CodeEdit(onChanged: (text: String) -> Unit, iv: MutableState<TextFieldValue>) {
@@ -61,8 +60,6 @@ fun CodeEdit(onChanged: (text: String) -> Unit, iv: MutableState<TextFieldValue>
     ) {
         OutlinedTextField(value = iv.value, onValueChange = {
             iv.value = it
-            //println(iv)
-            //iv.setValue(null , KProperty(TextFieldValue) , it)
             onChanged(iv.value.text)
         }, placeholder = {
             Text(text = stringResource(id = R.string.code_input_hint))
@@ -210,7 +207,7 @@ fun EditorWriteScreen(navController: NavHostController) {
             //println(it.toString())
             val inpFileValue = openFile(thisContext, it.toString())
             Log.w("Launcher", inpFileValue.toString())
-            if (inpFileValue!=null) {
+            if (inpFileValue != null) {
                 inputValue = TextFieldValue(inpFileValue.toString())
             }
 
