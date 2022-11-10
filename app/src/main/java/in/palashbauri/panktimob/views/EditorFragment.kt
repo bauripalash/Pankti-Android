@@ -1,4 +1,4 @@
-package bauri.palash.panktimob.views
+package `in`.palashbauri.panktimob.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -1,6 +1,9 @@
-package bauri.palash.panktimob.views
+package `in`.palashbauri.panktimob.views
 
 import `in`.palashbauri.panktijapi.androidapi.Androidapi.doParse
+import `in`.palashbauri.panktimob.R
+import `in`.palashbauri.panktimob.readFromCache
+import `in`.palashbauri.panktimob.saveToCache
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
@@ -25,9 +28,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import bauri.palash.panktimob.R
-import bauri.palash.panktimob.readFromCache
-import bauri.palash.panktimob.saveToCache
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.FileReader

@@ -7,7 +7,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "bauri.palash.panktimob"
+        applicationId "in.palashbauri.in"
         minSdk 27
         targetSdk 33
         versionCode 1
@@ -43,7 +43,7 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
-    namespace 'bauri.palash.panktimob'
+    namespace 'in.palashbauri.panktimob'
 }
 
 dependencies {

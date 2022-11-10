@@ -1,7 +1,12 @@
-package bauri.palash.panktimob.views
+package `in`.palashbauri.panktimob.views
 
 
 import `in`.palashbauri.panktijapi.androidapi.Androidapi.doParse
+import `in`.palashbauri.panktimob.R
+import `in`.palashbauri.panktimob.readFromCache
+import `in`.palashbauri.panktimob.saveToCache
+import `in`.palashbauri.panktimob.ui.theme.NotoBengali
+import `in`.palashbauri.panktimob.ui.theme.PanktiMobTheme
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -22,11 +27,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import bauri.palash.panktimob.R
-import bauri.palash.panktimob.readFromCache
-import bauri.palash.panktimob.saveToCache
-import bauri.palash.panktimob.ui.theme.NotoBengali
-import bauri.palash.panktimob.ui.theme.PanktiMobTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

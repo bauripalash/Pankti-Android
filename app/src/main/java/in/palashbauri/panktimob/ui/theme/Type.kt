@@ -1,12 +1,12 @@
-package bauri.palash.panktimob.ui.theme
+package `in`.palashbauri.panktimob.ui.theme
 
+import `in`.palashbauri.panktimob.R
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import bauri.palash.panktimob.R
 
 val NotoBengali = FontFamily(
     Font(R.font.noto_serif_bengali_regular, FontWeight.Normal),

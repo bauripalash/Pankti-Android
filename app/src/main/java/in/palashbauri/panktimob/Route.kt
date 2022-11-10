@@ -1,4 +1,4 @@
-package bauri.palash.panktimob
+package `in`.palashbauri.panktimob
 
 sealed class Route(val route: String) {
     object Repl : Route("Repl")

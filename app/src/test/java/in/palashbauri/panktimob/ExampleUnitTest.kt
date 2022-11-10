@@ -1,4 +1,4 @@
-package bauri.palash.panktimob
+package `in`.palashbauri.panktimob
 
 import org.junit.Test
 

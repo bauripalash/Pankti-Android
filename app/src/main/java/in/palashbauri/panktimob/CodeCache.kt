@@ -1,4 +1,4 @@
-package bauri.palash.panktimob
+package `in`.palashbauri.panktimob
 
 import android.content.Context
 import java.io.File

@@ -1,5 +1,7 @@
-package bauri.palash.panktimob.views
+package `in`.palashbauri.panktimob.views
 
+import `in`.palashbauri.panktimob.Route
+import `in`.palashbauri.panktimob.ui.theme.PanktiMobTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -17,8 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import bauri.palash.panktimob.Route
-import bauri.palash.panktimob.ui.theme.PanktiMobTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

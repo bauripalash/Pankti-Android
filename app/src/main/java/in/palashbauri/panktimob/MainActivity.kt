@@ -1,6 +1,8 @@
-package bauri.palash.panktimob
+package `in`.palashbauri.panktimob
 
 
+import `in`.palashbauri.panktimob.ui.theme.PanktiMobTheme
+import `in`.palashbauri.panktimob.views.Drawer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,8 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import bauri.palash.panktimob.ui.theme.PanktiMobTheme
-import bauri.palash.panktimob.views.Drawer
 
 
 class MainActivity : ComponentActivity() {

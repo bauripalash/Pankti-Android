@@ -1,4 +1,4 @@
-package bauri.palash.panktimob.ui.theme
+package `in`.palashbauri.panktimob.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
