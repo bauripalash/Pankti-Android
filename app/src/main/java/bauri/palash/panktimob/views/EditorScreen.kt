@@ -28,7 +28,9 @@ import androidx.navigation.compose.rememberNavController
 import bauri.palash.panktimob.R
 import bauri.palash.panktimob.readFromCache
 import bauri.palash.panktimob.saveToCache
+import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.FileReader
 
 const val EDITOR_CACHE = "editorcache.txt"
 
@@ -37,22 +39,19 @@ sealed class EditorScreenItems(var title: String, var route: String) {
     object RunResult : EditorScreenItems("Result", route = "result")
 }
 
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodeEdit(onChanged: (text: String) -> Unit) {
-
-
-    var inputValue by remember {
-        mutableStateOf(TextFieldValue(""))
-    }
+fun CodeEdit(onChanged: (text: String) -> Unit, iv: MutableState<TextFieldValue>) {
 
     var isNew by remember {
         mutableStateOf(true)
     }
 
     if (isNew) {
-        inputValue = TextFieldValue(readFromCache(LocalContext.current, EDITOR_CACHE))
-        onChanged(inputValue.text)
+        iv.value = TextFieldValue(readFromCache(LocalContext.current, EDITOR_CACHE))
+        onChanged(iv.value.text)
         isNew = false
     }
     Column(
@@ -60,9 +59,11 @@ fun CodeEdit(onChanged: (text: String) -> Unit) {
 
         verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OutlinedTextField(value = inputValue, onValueChange = {
-            inputValue = it
-            onChanged(inputValue.text)
+        OutlinedTextField(value = iv.value, onValueChange = {
+            iv.value = it
+            //println(iv)
+            //iv.setValue(null , KProperty(TextFieldValue) , it)
+            onChanged(iv.value.text)
         }, placeholder = {
             Text(text = stringResource(id = R.string.code_input_hint))
         }, modifier = Modifier
@@ -145,11 +146,32 @@ fun createFile(appCon: Context, uri: String, data: String) {
 
 }
 
+private fun openFile(appCon: Context, uri: String): String? {
+    val filePath = Uri.parse(uri)
+
+    try {
+        val parcelFileDescriptor = appCon.contentResolver.openFileDescriptor(filePath, "r")
+        val fileInputStream = FileInputStream(parcelFileDescriptor?.fileDescriptor)
+        val output = FileReader(parcelFileDescriptor?.fileDescriptor).readText()
+
+        //Log.w("OUTPUT : " , output)
+        fileInputStream.close()
+        parcelFileDescriptor?.close()
+        return output
+    } catch (e: Exception) {
+        showToastError(appCon, "Failed to Open File $uri")
+    }
+
+    return null
+}
+
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun EditorWriteScreen(navController: NavHostController) {
     var inputValue by remember {
         mutableStateOf(TextFieldValue(""))
     }
+
 
     var resultValue by remember {
         mutableStateOf(TextFieldValue(""))
@@ -160,12 +182,9 @@ fun EditorWriteScreen(navController: NavHostController) {
     }
 
     val thisContext = LocalContext.current
-    //ActivityResultContracts.CreateDocument
-    var xVal by remember {
-        mutableStateOf("")
-    }
+
     val aLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("text/plain"),
+        contract = ActivityResultContracts.CreateDocument("text/*"),
         onResult = {
             createFile(thisContext, it.toString(), inputValue.text)
         })
@@ -186,6 +205,22 @@ fun EditorWriteScreen(navController: NavHostController) {
         }
     }
 
+    val oLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
+            //println(it.toString())
+            val inpFileValue = openFile(thisContext, it.toString())
+            Log.w("Launcher", inpFileValue.toString())
+            if (inpFileValue!=null) {
+                inputValue = TextFieldValue(inpFileValue.toString())
+            }
+
+        }
+
+    val openClicked = {
+        oLauncher.launch(arrayOf("*/*"))
+
+    }
+
 
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -193,12 +228,13 @@ fun EditorWriteScreen(navController: NavHostController) {
 
             RunButton(clicked = runClicked, modifier = Modifier.weight(0.4F))
             SaveButton(clicked = saveClicked, modifier = Modifier.weight(0.4F))
-            OpenButton(clicked = runClicked, modifier = Modifier.weight(0.4F))
+            OpenButton(clicked = openClicked, modifier = Modifier.weight(0.4F))
 
         }
         NavHost(navController, startDestination = EditorScreenItems.Write.route) {
             composable(EditorScreenItems.Write.route) {
-                CodeEdit(inputChanged)
+
+                CodeEdit(inputChanged, mutableStateOf(inputValue)) //Not good!
             }
             composable(EditorScreenItems.RunResult.route) {
                 CodeResult(resultValue)
