@@ -45,7 +45,7 @@ fun MainView() {
 }
 
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     PanktiMobTheme {

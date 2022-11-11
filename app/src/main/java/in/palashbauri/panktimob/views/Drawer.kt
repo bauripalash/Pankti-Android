@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -112,6 +113,30 @@ fun Drawer(
                     }
                 )
                 //}
+                Spacer(modifier = Modifier.height(12.dp))
+                NavigationDrawerItem(label = { Text(text = "Settings") },
+
+
+                    selected = selItem == 2,
+                    onClick = {
+                        scope.launch { dState.close() }
+                        navCtrl.navigate("Settings") {
+                            popUpTo(navCtrl.graph.startDestDisplayName)
+                            //launchSingleTop(true)
+                        }
+
+                        selItem = 2
+
+                        //selItem.value =
+                    },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                    icon = {
+                        Icon(
+                            painterResource(id = R.drawable.ic_menubook),
+                            contentDescription = null
+                        )
+                    }
+                )
 
             }
         },
@@ -123,6 +148,10 @@ fun Drawer(
                 }
                 composable(route = Route.Editor.route) {
                     EditorFragment(scope, dState)
+                }
+                
+                composable(route = Route.Settings.route){
+                    SettingsScreen(appCon = LocalContext.current)
                 }
             }
         }
