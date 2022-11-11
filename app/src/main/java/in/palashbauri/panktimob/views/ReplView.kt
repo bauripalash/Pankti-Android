@@ -17,11 +17,13 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -43,7 +45,7 @@ fun RunButton(clicked: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        Button(
+        OutlinedButton(
             onClick = { clicked() },
             modifier = Modifier.fillMaxWidth(),
             enabled = true,
@@ -51,7 +53,11 @@ fun RunButton(clicked: () -> Unit) {
             shape = RoundedCornerShape(10.dp)
 
         ) {
-            Text(text = "Run />")
+            Icon(painter = painterResource(id = R.drawable.ic_run), contentDescription = stringResource(
+                id = R.string.run_button
+            ))
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Text(stringResource(id = R.string.run_button))
         }
     }
 
@@ -86,21 +92,21 @@ fun TopMenu(scope: CoroutineScope, dState: DrawerState) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodeInput(onChanged: (text: String) -> Unit) {
-    var inputValue by remember {
-        mutableStateOf(TextFieldValue(""))
-    }
+fun CodeInput( inputValue : String , onChanged: (text: String) -> Unit) {
+
 
     var isNew by remember {
         mutableStateOf(true)
     }
 
-
+    /*
     if (isNew) {
-        inputValue = TextFieldValue(readFromCache(LocalContext.current, CACHE_FILE_NAME))
+        inputValue = readFromCache(LocalContext.current, CACHE_FILE_NAME)
         onChanged(inputValue.text)
         isNew = false
     }
+
+     */
 
     Column(
         modifier = Modifier
@@ -113,12 +119,7 @@ fun CodeInput(onChanged: (text: String) -> Unit) {
         OutlinedTextField(
             textStyle = TextStyle(fontFamily = NotoBengali),
             value = inputValue,
-            onValueChange = {
-                inputValue = it
-
-                onChanged(inputValue.text)
-
-            },
+            onValueChange = onChanged,
             placeholder = {
                 Text(
                     text = stringResource(id = R.string.code_input_hint)
@@ -170,8 +171,8 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
 
 
     val thisContext = LocalContext.current
-    var inputValue by remember {
-        mutableStateOf(TextFieldValue(""))
+    var inputValue by rememberSaveable {
+        mutableStateOf("")
     }
 
 
@@ -179,9 +180,7 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
         mutableStateOf(TextFieldValue(""))
     }
 
-    val inputChanged: (value: String) -> Unit = {
-        inputValue = TextFieldValue(it)
-    }
+
 
 
     val clickedRun = {
@@ -189,8 +188,8 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
 
         //checkAndGetExternal(thisContext , Manifest.permission.CAMERA , launcher)
         //launcher.launch(Manifest.permission.CAMERA)
-        saveToCache(thisContext, CACHE_FILE_NAME, inputValue.text)
-        val pd = doParse(inputValue.text)
+        saveToCache(thisContext, CACHE_FILE_NAME, inputValue)
+        val pd = doParse(inputValue)
         resultValue = TextFieldValue(pd)
 
         println(readFromCache(thisContext, CACHE_FILE_NAME))
@@ -213,7 +212,7 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
             Spacer(modifier = Modifier.size(5.dp))
 
             // Code Input
-            CodeInput(onChanged = inputChanged)
+            CodeInput(inputValue , onChanged = { inputValue = it })
 
             Spacer(modifier = Modifier.size(5.dp))
 

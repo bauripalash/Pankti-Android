@@ -2,4 +2,9 @@
     <string name="app_name">Pankti</string>
     <string name="code_input_hint">Write code…</string>
     <string name="code_output_hint">[Output]</string>
+    <string name="run_button">Run</string>
+    <string name="open_button">Open</string>
+    <string name="save_button">Save</string>
+    <string name="repl">REPL</string>
+    <string name="editor">Editor</string>
 </resources>

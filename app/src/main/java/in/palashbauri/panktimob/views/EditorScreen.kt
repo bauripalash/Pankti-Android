@@ -2,7 +2,6 @@ package `in`.palashbauri.panktimob.views
 
 import `in`.palashbauri.panktijapi.androidapi.Androidapi.doParse
 import `in`.palashbauri.panktimob.R
-import `in`.palashbauri.panktimob.readFromCache
 import `in`.palashbauri.panktimob.saveToCache
 import android.annotation.SuppressLint
 import android.content.Context
@@ -17,11 +16,12 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -32,40 +32,29 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.FileReader
 
-const val EDITOR_CACHE = "editorcache.txt"
+const val EDITOR_CACHE = "editor-cache.txt"
 
 sealed class EditorScreenItems(var title: String, var route: String) {
     object Write : EditorScreenItems("Write", "write")
-    object RunResult : EditorScreenItems("Result", route = "result")
+    object RunResult : EditorScreenItems("Result", "result")
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodeEdit(onChanged: (text: String) -> Unit, iv: MutableState<TextFieldValue>) {
+fun CodeEdit(value: String, onChanged: (text: String) -> Unit) {
 
-    var isNew by remember {
-        mutableStateOf(true)
-    }
-
-    if (isNew) {
-        iv.value = TextFieldValue(readFromCache(LocalContext.current, EDITOR_CACHE))
-        onChanged(iv.value.text)
-        isNew = false
-    }
     Column(
         modifier = Modifier.fillMaxSize(),
 
         verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OutlinedTextField(value = iv.value, onValueChange = {
-            iv.value = it
-            onChanged(iv.value.text)
-        }, placeholder = {
-            Text(text = stringResource(id = R.string.code_input_hint))
-        }, modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 100.dp)
+        OutlinedTextField(
+            value = value, onValueChange = onChanged, placeholder = {
+                Text(text = stringResource(id = R.string.code_input_hint))
+            }, modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 100.dp)
 
 
         )
@@ -78,7 +67,7 @@ fun CodeEdit(onChanged: (text: String) -> Unit, iv: MutableState<TextFieldValue>
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodeResult(resultValue: TextFieldValue) {
+fun CodeResult(resultValue: String, onChanged: (text: String) -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
 
@@ -86,7 +75,7 @@ fun CodeResult(resultValue: TextFieldValue) {
     ) {
         OutlinedTextField(
             value = resultValue,
-            onValueChange = { /* Not needed */ },
+            onValueChange = onChanged,
             placeholder = { Text(text = stringResource(id = R.string.code_output_hint)) },
             modifier = Modifier
                 .fillMaxSize()
@@ -101,21 +90,36 @@ fun CodeResult(resultValue: TextFieldValue) {
 @Composable
 fun RunButton(clicked: () -> Unit, modifier: Modifier) {
     OutlinedButton(onClick = clicked, modifier = modifier) {
-        Text(text = "Run/>")
+        Icon(painter = painterResource(id = R.drawable.ic_run), contentDescription = stringResource(
+            id = R.string.run_button
+        ))
+        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+
+        Text(text = stringResource(id = R.string.run_button))
     }
 }
 
 @Composable
 fun SaveButton(clicked: () -> Unit, modifier: Modifier) {
     OutlinedButton(onClick = clicked, modifier = modifier) {
-        Text(text = "Save")
+        Icon(painter = painterResource(id = R.drawable.ic_save), contentDescription = stringResource(
+            id = R.string.save_button
+        ))
+        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+
+        Text(text = stringResource(id = R.string.save_button))
     }
 }
 
 @Composable
 fun OpenButton(clicked: () -> Unit, modifier: Modifier) {
     OutlinedButton(onClick = clicked, modifier = modifier) {
-        Text(text = "Open")
+        Icon(painter = painterResource(id = R.drawable.ic_openfile), contentDescription = stringResource(
+            id = R.string.open_button
+        ))
+        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+
+        Text(text = stringResource(id = R.string.open_button))
     }
 }
 
@@ -126,7 +130,6 @@ private fun showToastError(appCon: Context, msg: String) {
 fun createFile(appCon: Context, uri: String, data: String) {
     Log.d("createFILE", uri)
     val filePath = Uri.parse(uri)
-    //val fileObject = filePath.path?.let { File(it) }
     try {
 
         val parcelFileDescriptor = appCon.contentResolver.openFileDescriptor(filePath, "rw")
@@ -162,35 +165,31 @@ private fun openFile(appCon: Context, uri: String): String? {
     return null
 }
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun EditorWriteScreen(navController: NavHostController) {
-    var inputValue by remember {
-        mutableStateOf(TextFieldValue(""))
+    var inputValue by rememberSaveable {
+        mutableStateOf("")
     }
 
 
-    var resultValue by remember {
-        mutableStateOf(TextFieldValue(""))
+    var resultValue by rememberSaveable {
+        mutableStateOf("")
     }
 
-    val inputChanged: (value: String) -> Unit = {
-        inputValue = TextFieldValue(it)
-    }
 
     val thisContext = LocalContext.current
 
     val aLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("text/*"),
         onResult = {
-            createFile(thisContext, it.toString(), inputValue.text)
+            createFile(thisContext, it.toString(), inputValue)
         })
     val runClicked = {
         //SaveToTempEditorFile(thisContext , inputValue.text)
-        saveToCache(thisContext, EDITOR_CACHE, inputValue.text)
-        val pd = doParse(inputValue.text)
+        saveToCache(thisContext, EDITOR_CACHE, inputValue)
+        val pd = doParse(inputValue)
 
-        resultValue = TextFieldValue(pd)
+        resultValue = pd
 
     }
 
@@ -208,7 +207,7 @@ fun EditorWriteScreen(navController: NavHostController) {
             val inpFileValue = openFile(thisContext, it.toString())
             Log.w("Launcher", inpFileValue.toString())
             if (inpFileValue != null) {
-                inputValue = TextFieldValue(inpFileValue.toString())
+                inputValue = inpFileValue.toString()
             }
 
         }
@@ -224,17 +223,21 @@ fun EditorWriteScreen(navController: NavHostController) {
         Row(modifier = Modifier.fillMaxWidth()) {
 
             RunButton(clicked = runClicked, modifier = Modifier.weight(0.4F))
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+
             SaveButton(clicked = saveClicked, modifier = Modifier.weight(0.4F))
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+
             OpenButton(clicked = openClicked, modifier = Modifier.weight(0.4F))
 
         }
         NavHost(navController, startDestination = EditorScreenItems.Write.route) {
             composable(EditorScreenItems.Write.route) {
 
-                CodeEdit(inputChanged, mutableStateOf(inputValue)) //Not good!
+                CodeEdit(inputValue, onChanged = { inputValue = it }) //Not good!
             }
             composable(EditorScreenItems.RunResult.route) {
-                CodeResult(resultValue)
+                CodeResult(resultValue, onChanged = { resultValue = it })
             }
 
         }
@@ -280,7 +283,7 @@ fun BottomNav(navController: NavHostController) {
 
         }, label = { Text(text = EditorScreenItems.RunResult.title) }, icon = {
             Icon(
-                Icons.Filled.Build, contentDescription = EditorScreenItems.RunResult.title
+                painterResource(id = R.drawable.ic_menubook), contentDescription = EditorScreenItems.RunResult.title
             )
         })
         //}
