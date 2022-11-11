@@ -12,7 +12,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -90,9 +89,11 @@ fun CodeResult(resultValue: String, onChanged: (text: String) -> Unit) {
 @Composable
 fun RunButton(clicked: () -> Unit, modifier: Modifier) {
     OutlinedButton(onClick = clicked, modifier = modifier) {
-        Icon(painter = painterResource(id = R.drawable.ic_run), contentDescription = stringResource(
-            id = R.string.run_button
-        ))
+        Icon(
+            painter = painterResource(id = R.drawable.ic_run), contentDescription = stringResource(
+                id = R.string.run_button
+            )
+        )
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
 
         Text(text = stringResource(id = R.string.run_button))
@@ -102,9 +103,11 @@ fun RunButton(clicked: () -> Unit, modifier: Modifier) {
 @Composable
 fun SaveButton(clicked: () -> Unit, modifier: Modifier) {
     OutlinedButton(onClick = clicked, modifier = modifier) {
-        Icon(painter = painterResource(id = R.drawable.ic_save), contentDescription = stringResource(
-            id = R.string.save_button
-        ))
+        Icon(
+            painter = painterResource(id = R.drawable.ic_save), contentDescription = stringResource(
+                id = R.string.save_button
+            )
+        )
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
 
         Text(text = stringResource(id = R.string.save_button))
@@ -114,9 +117,12 @@ fun SaveButton(clicked: () -> Unit, modifier: Modifier) {
 @Composable
 fun OpenButton(clicked: () -> Unit, modifier: Modifier) {
     OutlinedButton(onClick = clicked, modifier = modifier) {
-        Icon(painter = painterResource(id = R.drawable.ic_openfile), contentDescription = stringResource(
-            id = R.string.open_button
-        ))
+        Icon(
+            painter = painterResource(id = R.drawable.ic_openfile),
+            contentDescription = stringResource(
+                id = R.string.open_button
+            )
+        )
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
 
         Text(text = stringResource(id = R.string.open_button))
@@ -283,7 +289,8 @@ fun BottomNav(navController: NavHostController) {
 
         }, label = { Text(text = EditorScreenItems.RunResult.title) }, icon = {
             Icon(
-                painterResource(id = R.drawable.ic_menubook), contentDescription = EditorScreenItems.RunResult.title
+                painterResource(id = R.drawable.ic_menubook),
+                contentDescription = EditorScreenItems.RunResult.title
             )
         })
         //}

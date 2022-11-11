@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-const val CACHE_FILE_NAME = "replcache.txt"
+const val CACHE_FILE_NAME = "repl-cache.txt"
 
 @Composable
 fun RunButton(clicked: () -> Unit) {
@@ -53,9 +53,12 @@ fun RunButton(clicked: () -> Unit) {
             shape = RoundedCornerShape(10.dp)
 
         ) {
-            Icon(painter = painterResource(id = R.drawable.ic_run), contentDescription = stringResource(
-                id = R.string.run_button
-            ))
+            Icon(
+                painter = painterResource(id = R.drawable.ic_run),
+                contentDescription = stringResource(
+                    id = R.string.run_button
+                )
+            )
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
             Text(stringResource(id = R.string.run_button))
         }
@@ -92,21 +95,8 @@ fun TopMenu(scope: CoroutineScope, dState: DrawerState) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodeInput( inputValue : String , onChanged: (text: String) -> Unit) {
+fun CodeInput(inputValue: String, onChanged: (text: String) -> Unit) {
 
-
-    var isNew by remember {
-        mutableStateOf(true)
-    }
-
-    /*
-    if (isNew) {
-        inputValue = readFromCache(LocalContext.current, CACHE_FILE_NAME)
-        onChanged(inputValue.text)
-        isNew = false
-    }
-
-     */
 
     Column(
         modifier = Modifier
@@ -181,8 +171,6 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
     }
 
 
-
-
     val clickedRun = {
         //println("Button Clicked!")
 
@@ -212,7 +200,7 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
             Spacer(modifier = Modifier.size(5.dp))
 
             // Code Input
-            CodeInput(inputValue , onChanged = { inputValue = it })
+            CodeInput(inputValue, onChanged = { inputValue = it })
 
             Spacer(modifier = Modifier.size(5.dp))
 

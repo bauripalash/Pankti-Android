@@ -6,15 +6,8 @@ import `in`.palashbauri.panktimob.ui.theme.PanktiMobTheme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -28,12 +21,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Drawer(
-    modifier: Modifier = Modifier, scope: CoroutineScope = rememberCoroutineScope(),
+    scope: CoroutineScope = rememberCoroutineScope(),
     dState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 ) {
 
@@ -41,11 +32,10 @@ fun Drawer(
 
 
     //val scope = rememberCoroutineScope()
-    val dItems = listOf(
-        Icons.Default.List,
-        Icons.Default.Info
-    )
-    val selItem = remember { mutableStateOf(dItems[0]) }
+
+    var selItem by remember {
+        mutableStateOf(0)
+    }
     ModalNavigationDrawer(
         drawerState = dState,
         drawerContent = {
@@ -58,6 +48,7 @@ fun Drawer(
                         .fillMaxWidth()
 
                 ) {
+
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -76,25 +67,31 @@ fun Drawer(
                 NavigationDrawerItem(label = { Text(stringResource(id = R.string.editor)) },
 
 
-                    selected = false,
+                    selected = selItem == 1,
                     onClick = {
                         scope.launch { dState.close() }
                         navCtrl.navigate("Editor") {
                             popUpTo(navCtrl.graph.startDestDisplayName)
                             //launchSingleTop = true
                         }
+                        selItem = 1
 
 
                         //selItem.value =
                     },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                    icon = { Icon(painterResource(id = R.drawable.ic_edit_icon), contentDescription = null) }
+                    icon = {
+                        Icon(
+                            painterResource(id = R.drawable.ic_edit_icon),
+                            contentDescription = null
+                        )
+                    }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 NavigationDrawerItem(label = { Text(text = stringResource(id = R.string.repl)) },
 
 
-                    selected = false,
+                    selected = selItem == 0,
                     onClick = {
                         scope.launch { dState.close() }
                         navCtrl.navigate("Repl") {
@@ -102,10 +99,17 @@ fun Drawer(
                             //launchSingleTop(true)
                         }
 
+                        selItem = 0
+
                         //selItem.value =
                     },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                    icon = { Icon(painterResource(id = R.drawable.ic_quick), contentDescription = null) }
+                    icon = {
+                        Icon(
+                            painterResource(id = R.drawable.ic_quick),
+                            contentDescription = null
+                        )
+                    }
                 )
                 //}
 

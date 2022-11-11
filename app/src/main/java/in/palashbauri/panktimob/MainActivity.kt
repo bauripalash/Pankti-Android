@@ -33,11 +33,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!\n")
-
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
