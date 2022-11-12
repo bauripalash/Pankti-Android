@@ -12,6 +12,9 @@ import `in`.palashbauri.panktimob.R
 import android.app.Activity
 import android.app.LocaleManager
 import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent
+import android.content.res.Configuration
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -71,13 +74,14 @@ fun SettingsTopMenu() {
 @Preview(showBackground = true)
 @Composable
 fun SsPreview(){
-    SettingsScreen(appCon = LocalContext.current)
+    SettingsScreen(appCon = LocalContext.current , currentComposer)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun SettingsScreen(appCon : Context){
+fun SettingsScreen(appCon : Context , curcom : Composer){
+    AppCompatDelegate.getApplicationLocales()[0]?.let { Log.i( "SettingsScreenBegin" , it.displayLanguage) }
     var expanded by remember {
         mutableStateOf(false)
     }
@@ -90,15 +94,24 @@ fun SettingsScreen(appCon : Context){
         mutableStateOf(Size.Zero)
     }
 
+    val langId by remember {
+        mutableStateOf(R.string.code_input_hint)
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
-        SettingsTopMenu()
+        //SettingsTopMenu()
+        Button(onClick = { changeLanguage(appCon , selLang) }) {
+            Icon(Icons.Default.Settings, contentDescription = "Settings")
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Text(text = appCon.getString(R.string.save_button))
+        }
         Spacer(modifier = Modifier.size(5.dp))
         Row( modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp) ,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center) {
-            Text(text = "Language" , modifier = Modifier.weight(0.5F))
+            Text(text = appCon.getString(R.string.save_button) , modifier = Modifier.weight(0.5F))
             Row(modifier = Modifier.weight(0.5F)) {
                 //Text(text = "Language" , modifier = Modifier.weight(0.5F))
 
@@ -112,7 +125,7 @@ fun SettingsScreen(appCon : Context){
                             // the DropDown the same width
                             TFSize = coordinates.size.toSize()
                         },
-                    label = { Text("Language") },
+                    label = { Text(appCon.getText(R.string.code_output_hint).toString()) },
                     trailingIcon = {
                         Icon(Icons.Default.ArrowDropDown, "contentDescription",
                             Modifier.clickable { expanded = !expanded })
@@ -130,18 +143,22 @@ fun SettingsScreen(appCon : Context){
                             selLang = l.name
 
 
-                            val activity = appCon as Activity
+
+                            //val activity = appCon as Activity
 
                             //activity.runOnUiThread {  }
 
-                            Handler(Looper.getMainLooper()).post {
-                                val appLocale = LocaleListCompat.forLanguageTags("bn")
-                                AppCompatDelegate.setApplicationLocales(appLocale)
+                            //Handler(Looper.getMainLooper()).post {
+                                //val appLocale = LocaleListCompat.forLanguageTags("bn")
+                                //AppCompatDelegate.setApplicationLocales(appLocale)
                                 //activity.recreate()
+                            //currentComposer.composition.recompose()
+                            //println(curcom.composition.recompose())
+                            //changeLanguage(appCon , l.code)
 
-                            }
+                            //}
 
-                            Log.d("DropLang" , AppCompatDelegate.getApplicationLocales().toString())
+                            Log.d("DropLang" , AppCompatDelegate.getApplicationLocales().toLanguageTags())
 
                         })
                     }
@@ -151,5 +168,21 @@ fun SettingsScreen(appCon : Context){
 
         ////
     }
+}
+
+fun Context.findActivity() : Activity? = when(this){
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
+}
+
+fun changeLanguage( context: Context , language: String ){
+    context.findActivity()?.runOnUiThread {
+        val appLocale = LocaleListCompat.forLanguageTags(language)
+        AppCompatDelegate.setApplicationLocales(appLocale)
+        //context.findActivity()?.recreate()
+    }
+
+    //context.findActivity()?.recreate()
 }
 

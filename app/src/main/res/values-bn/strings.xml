@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pankti</string>
+    <string name="code_input_hint">"পংতি লেখুন"</string>
+    <string name="code_output_hint">[ফলাফল]</string>
+    <string name="run_button">"চালান"</string>
+    <string name="open_button">খুলুন</string>
+    <string name="save_button">"সংরক্ষণ"</string>
+    <string name="repl">তাৎক্ষণিক</string>
+    <string name="editor">"সম্পাদনা"</string>
+</resources>

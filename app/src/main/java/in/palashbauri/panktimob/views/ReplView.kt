@@ -7,6 +7,7 @@ import `in`.palashbauri.panktimob.readFromCache
 import `in`.palashbauri.panktimob.saveToCache
 import `in`.palashbauri.panktimob.ui.theme.NotoBengali
 import `in`.palashbauri.panktimob.ui.theme.PanktiMobTheme
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -35,7 +36,7 @@ import kotlinx.coroutines.launch
 const val CACHE_FILE_NAME = "repl-cache.txt"
 
 @Composable
-fun RunButton(clicked: () -> Unit) {
+fun RunButton(appCon : Context, clicked: () -> Unit) {
 
 
     val btnBg = SolidColor(Color(R.color.white))
@@ -55,9 +56,7 @@ fun RunButton(clicked: () -> Unit) {
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_run),
-                contentDescription = stringResource(
-                    id = R.string.run_button
-                )
+                contentDescription = appCon.getString(R.string.run_button)
             )
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
             Text(stringResource(id = R.string.run_button))
@@ -95,7 +94,7 @@ fun TopMenu(scope: CoroutineScope, dState: DrawerState) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodeInput(inputValue: String, onChanged: (text: String) -> Unit) {
+fun CodeInput(appCon : Context , inputValue: String, onChanged: (text: String) -> Unit) {
 
 
     Column(
@@ -112,7 +111,7 @@ fun CodeInput(inputValue: String, onChanged: (text: String) -> Unit) {
             onValueChange = onChanged,
             placeholder = {
                 Text(
-                    text = stringResource(id = R.string.code_input_hint)
+                    text = appCon.getString(R.string.code_input_hint)
                 )
             },
 
@@ -133,7 +132,7 @@ fun CodeInput(inputValue: String, onChanged: (text: String) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodeOutput(resultValue: TextFieldValue) {
+fun CodeOutput(appCon: Context , resultValue: TextFieldValue) {
     val sState = rememberScrollState(0) //Scroll State for Output
     Column(
         modifier = Modifier
@@ -144,7 +143,7 @@ fun CodeOutput(resultValue: TextFieldValue) {
     ) {
         OutlinedTextField(
             value = resultValue, onValueChange = { /* No Need of anything here, I guess*/ },
-            placeholder = { Text(text = stringResource(id = R.string.code_output_hint)) },
+            placeholder = { Text(text = appCon.getString(R.string.code_output_hint)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
@@ -200,15 +199,15 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
             Spacer(modifier = Modifier.size(5.dp))
 
             // Code Input
-            CodeInput(inputValue, onChanged = { inputValue = it })
+            CodeInput(thisContext ,inputValue, onChanged = { inputValue = it })
 
             Spacer(modifier = Modifier.size(5.dp))
 
-            RunButton(clickedRun)
+            RunButton(thisContext , clickedRun)
             Spacer(modifier = Modifier.size(5.dp))
 
             //Code Output / Result
-            CodeOutput(resultValue = resultValue)
+            CodeOutput(thisContext , resultValue = resultValue)
         }
     }
 

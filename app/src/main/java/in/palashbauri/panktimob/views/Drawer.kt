@@ -151,7 +151,7 @@ fun Drawer(
                 }
                 
                 composable(route = Route.Settings.route){
-                    SettingsScreen(appCon = LocalContext.current)
+                    SettingsScreen(appCon = LocalContext.current , currentComposer)
                 }
             }
         }
