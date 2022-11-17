@@ -29,7 +29,7 @@ fun Drawer(
     dState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 ) {
 
-    val navCtrl = rememberNavController()
+    val navController = rememberNavController()
 
 
     //val scope = rememberCoroutineScope()
@@ -71,8 +71,8 @@ fun Drawer(
                     selected = selItem == 1,
                     onClick = {
                         scope.launch { dState.close() }
-                        navCtrl.navigate("Editor") {
-                            popUpTo(navCtrl.graph.startDestDisplayName)
+                        navController.navigate("Editor") {
+                            popUpTo(navController.graph.startDestDisplayName)
                             //launchSingleTop = true
                         }
                         selItem = 1
@@ -95,8 +95,8 @@ fun Drawer(
                     selected = selItem == 0,
                     onClick = {
                         scope.launch { dState.close() }
-                        navCtrl.navigate("Repl") {
-                            popUpTo(navCtrl.graph.startDestDisplayName)
+                        navController.navigate("Repl") {
+                            popUpTo(navController.graph.startDestDisplayName)
                             //launchSingleTop(true)
                         }
 
@@ -114,44 +114,22 @@ fun Drawer(
                 )
                 //}
                 Spacer(modifier = Modifier.height(12.dp))
-                NavigationDrawerItem(label = { Text(text = "Settings") },
 
-
-                    selected = selItem == 2,
-                    onClick = {
-                        scope.launch { dState.close() }
-                        navCtrl.navigate("Settings") {
-                            popUpTo(navCtrl.graph.startDestDisplayName)
-                            //launchSingleTop(true)
-                        }
-
-                        selItem = 2
-
-                        //selItem.value =
-                    },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                    icon = {
-                        Icon(
-                            painterResource(id = R.drawable.ic_menubook),
-                            contentDescription = null
-                        )
-                    }
-                )
 
             }
         },
         content = {
             //TopMenu(scope, dState )
-            NavHost(navController = navCtrl, startDestination = Route.Repl.route) {
+            NavHost(navController = navController, startDestination = Route.Repl.route) {
                 composable(route = Route.Repl.route) {
-                    Repl(scope = scope, dState = dState)
+                    Repl(scope = scope, dState = dState, navController)
                 }
                 composable(route = Route.Editor.route) {
-                    EditorFragment(scope, dState)
+                    EditorFragment(scope, dState, navController)
                 }
-                
-                composable(route = Route.Settings.route){
-                    SettingsScreen(appCon = LocalContext.current , currentComposer)
+
+                composable(route = Route.Settings.route) {
+                    SettingsScreen(appCon = LocalContext.current, navController)
                 }
             }
         }

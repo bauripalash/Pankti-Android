@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,18 +22,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 const val CACHE_FILE_NAME = "repl-cache.txt"
 
+
 @Composable
-fun RunButton(appCon : Context, clicked: () -> Unit) {
+fun RunButton(appCon: Context, clicked: () -> Unit) {
 
 
     val btnBg = SolidColor(Color(R.color.white))
@@ -59,7 +57,7 @@ fun RunButton(appCon : Context, clicked: () -> Unit) {
                 contentDescription = appCon.getString(R.string.run_button)
             )
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text(stringResource(id = R.string.run_button))
+            Text(appCon.getString(R.string.run_button))
         }
     }
 
@@ -68,33 +66,7 @@ fun RunButton(appCon : Context, clicked: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopMenu(scope: CoroutineScope, dState: DrawerState) {
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(
-            onClick = {
-                if (dState.isClosed) {
-                    scope.launch { dState.open() }
-                } else if (dState.isOpen) {
-                    scope.launch { dState.close() }
-                }
-
-            },
-        ) {
-            Icon(Icons.Default.Menu, contentDescription = "Open Drawer")
-        }
-
-        Text(text = "Pankti", modifier = Modifier.weight(1f))
-
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(Icons.Default.Settings, contentDescription = "Settings")
-        }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CodeInput(appCon : Context , inputValue: String, onChanged: (text: String) -> Unit) {
+fun CodeInput(appCon: Context, inputValue: String, onChanged: (text: String) -> Unit) {
 
 
     Column(
@@ -121,9 +93,6 @@ fun CodeInput(appCon : Context , inputValue: String, onChanged: (text: String) -
                 .height(550.dp)
                 .heightIn(550.dp, 550.dp)
 
-
-            //.verticalScroll(sState , enabled = true)
-            //.scrollable(state = sState, orientation = Orientation.Vertical)
         )
 
 
@@ -132,7 +101,7 @@ fun CodeInput(appCon : Context , inputValue: String, onChanged: (text: String) -
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CodeOutput(appCon: Context , resultValue: TextFieldValue) {
+fun CodeOutput(appCon: Context, resultValue: TextFieldValue) {
     val sState = rememberScrollState(0) //Scroll State for Output
     Column(
         modifier = Modifier
@@ -156,7 +125,7 @@ fun CodeOutput(appCon: Context , resultValue: TextFieldValue) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Repl(scope: CoroutineScope, dState: DrawerState) {
+fun Repl(scope: CoroutineScope, dState: DrawerState, navController: NavController) {
 
 
     val thisContext = LocalContext.current
@@ -171,11 +140,8 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
 
 
     val clickedRun = {
-        //println("Button Clicked!")
-
-        //checkAndGetExternal(thisContext , Manifest.permission.CAMERA , launcher)
-        //launcher.launch(Manifest.permission.CAMERA)
         saveToCache(thisContext, CACHE_FILE_NAME, inputValue)
+
         val pd = doParse(inputValue)
         resultValue = TextFieldValue(pd)
 
@@ -195,19 +161,19 @@ fun Repl(scope: CoroutineScope, dState: DrawerState) {
             horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
-            TopMenu(scope, dState)
+            TopMenu(scope, dState, navController)
             Spacer(modifier = Modifier.size(5.dp))
 
             // Code Input
-            CodeInput(thisContext ,inputValue, onChanged = { inputValue = it })
+            CodeInput(thisContext, inputValue, onChanged = { inputValue = it })
 
             Spacer(modifier = Modifier.size(5.dp))
 
-            RunButton(thisContext , clickedRun)
+            RunButton(thisContext, clickedRun)
             Spacer(modifier = Modifier.size(5.dp))
 
             //Code Output / Result
-            CodeOutput(thisContext , resultValue = resultValue)
+            CodeOutput(thisContext, resultValue = resultValue)
         }
     }
 
@@ -221,7 +187,8 @@ fun DefaultPreview() {
     PanktiMobTheme {
         val tempScope = rememberCoroutineScope()
         val tempDState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val navController = rememberNavController()
 
-        Repl(tempScope, tempDState)
+        Repl(tempScope, tempDState, navController)
     }
 }

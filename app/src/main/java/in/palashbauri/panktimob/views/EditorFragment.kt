@@ -12,11 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import kotlinx.coroutines.CoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorFragment(scope: CoroutineScope, dState: DrawerState) {
+fun EditorFragment(scope: CoroutineScope, dState: DrawerState, navController: NavController) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -28,7 +29,7 @@ fun EditorFragment(scope: CoroutineScope, dState: DrawerState) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TopMenu(scope, dState)
+            TopMenu(scope, dState, navController)
             EditorView()
         }
 

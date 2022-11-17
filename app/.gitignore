@@ -1,5 +1,5 @@
 /build
-/libs/androidapi.aar
-/libs/androidapi-sources.jar
+/libs/*.aar
+/libs/*.jar
 /release/app-release.apk
 /release/output-metadata.json

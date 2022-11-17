@@ -4,9 +4,8 @@ package `in`.palashbauri.panktimob
 import `in`.palashbauri.panktimob.ui.theme.PanktiMobTheme
 import `in`.palashbauri.panktimob.views.Drawer
 import android.os.Bundle
-import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -17,12 +16,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.os.LocaleListCompat
 
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
-        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("bn"))
-        AppCompatDelegate.getApplicationLocales()[0]?.let { Log.i("MainView" , it.displayLanguage) }
+        val lang = AppCompatDelegate.getApplicationLocales().get(0)?.toLanguageTag()
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(lang))
+
         setContent {
             PanktiMobTheme {
                 // A surface container using the 'background' color from the theme
@@ -30,6 +29,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+
                     MainView()
 
 
@@ -47,7 +47,7 @@ fun MainView() {
     val dState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
 
-    //Repl()
+    //Repl() as Default
     Drawer(scope = dScope, dState = dState)
 
 }

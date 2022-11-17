@@ -1,69 +1,52 @@
 package `in`.palashbauri.panktimob.views
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import `in`.palashbauri.panktimob.R
 import android.app.Activity
-import android.app.LocaleManager
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.Intent
-import android.content.res.Configuration
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import androidx.core.content.getSystemService
 import androidx.core.os.LocaleListCompat
-import java.util.Locale
-
-sealed class Language(val name : String , val code : String){
-    object Bengali : Language(name = "Bengali" , code = "bn")
-    object English : Language(name = "English" , code = "en")
-}
-
-val langs = listOf(
-    Language.English,
-    Language.Bengali
-)
-
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsTopMenu() {
-    
+fun SettingsTopMenu(navController: NavController, saveSettings: () -> Unit) {
+    val currentContext = LocalContext.current
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         IconButton(
             onClick = {
-                /* TODO */
+                if (!navController.popBackStack()) {
+                    currentContext.findActivity()?.finish()
+                }
 
             },
         ) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Open Drawer")
+            Icon(Icons.Default.ArrowBack, contentDescription = "Back to previous")
         }
 
-        Text(text = "Settings", modifier = Modifier.weight(1f))
+        Text(text = stringResource(id = R.string.settings), modifier = Modifier.weight(1f))
 
-        Button(onClick = { /*TODO*/ }) {
+        Button(onClick = saveSettings) {
             Icon(Icons.Default.Settings, contentDescription = "Settings")
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
             Text(text = stringResource(R.string.save_button))
@@ -73,59 +56,72 @@ fun SettingsTopMenu() {
 
 @Preview(showBackground = true)
 @Composable
-fun SsPreview(){
-    SettingsScreen(appCon = LocalContext.current , currentComposer)
+fun SsPreview() {
+    val tempNavController = rememberNavController()
+    SettingsScreen(appCon = LocalContext.current, tempNavController)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun SettingsScreen(appCon : Context , curcom : Composer){
-    AppCompatDelegate.getApplicationLocales()[0]?.let { Log.i( "SettingsScreenBegin" , it.displayLanguage) }
+fun SettingsScreen(appCon: Context, navController: NavController) {
+
+    val bengaliLang = mapOf("name" to stringResource(id = R.string.bengali), "code" to "bn")
+    val englishLang = mapOf("name" to stringResource(id = R.string.english), "code" to "en")
+
+    val langs = listOf(
+        bengaliLang,
+        englishLang
+    )
+
+
     var expanded by remember {
         mutableStateOf(false)
     }
 
-    var selLang by remember{
+    var selLang by remember {
         mutableStateOf("")
     }
 
-    var TFSize by remember {
+    var selLangName by remember {
+        mutableStateOf(AppCompatDelegate.getApplicationLocales()[0]?.displayName ?: "")
+    }
+
+
+    var tFSize by remember {
         mutableStateOf(Size.Zero)
     }
 
-    val langId by remember {
-        mutableStateOf(R.string.code_input_hint)
-    }
+
 
     Column(modifier = Modifier.fillMaxSize()) {
-        //SettingsTopMenu()
-        Button(onClick = { changeLanguage(appCon , selLang) }) {
-            Icon(Icons.Default.Settings, contentDescription = "Settings")
-            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text(text = appCon.getString(R.string.save_button))
+
+        SettingsTopMenu(navController) {
+            changeLanguage(appCon, selLang)
         }
         Spacer(modifier = Modifier.size(5.dp))
-        Row( modifier = Modifier
-            .fillMaxWidth()
-            .padding(15.dp) ,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center) {
-            Text(text = appCon.getString(R.string.save_button) , modifier = Modifier.weight(0.5F))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(text = stringResource(id = R.string.language), modifier = Modifier.weight(0.5F))
             Row(modifier = Modifier.weight(0.5F)) {
                 //Text(text = "Language" , modifier = Modifier.weight(0.5F))
 
                 OutlinedTextField(
-                    value = selLang,
-                    onValueChange = { selLang = it },
+                    value = selLangName,
+                    onValueChange = { selLangName = it },
                     modifier = Modifier
                         .fillMaxWidth()
                         .onGloballyPositioned { coordinates ->
                             // This value is used to assign to
                             // the DropDown the same width
-                            TFSize = coordinates.size.toSize()
+                            tFSize = coordinates.size.toSize()
                         },
-                    label = { Text(appCon.getText(R.string.code_output_hint).toString()) },
+                    label = { AppCompatDelegate.getApplicationLocales()[0]?.let { Text(it.displayName) } },
                     trailingIcon = {
                         Icon(Icons.Default.ArrowDropDown, "contentDescription",
                             Modifier.clickable { expanded = !expanded })
@@ -133,32 +129,16 @@ fun SettingsScreen(appCon : Context , curcom : Composer){
                 )
 
                 DropdownMenu(expanded = expanded,
-                    modifier = Modifier.width(with(LocalDensity.current) { TFSize.width.toDp() }),
+                    modifier = Modifier.width(with(LocalDensity.current) { tFSize.width.toDp() }),
                     onDismissRequest = { expanded = false }) {
                     langs.forEach { l ->
                         DropdownMenuItem(text = {
-                            Text(text = l.name)
+                            Text(text = l["name"].toString())
                         }, onClick = {
                             expanded = false
-                            selLang = l.name
+                            selLang = l["code"].toString()
+                            selLangName = l["name"].toString()
 
-
-
-                            //val activity = appCon as Activity
-
-                            //activity.runOnUiThread {  }
-
-                            //Handler(Looper.getMainLooper()).post {
-                                //val appLocale = LocaleListCompat.forLanguageTags("bn")
-                                //AppCompatDelegate.setApplicationLocales(appLocale)
-                                //activity.recreate()
-                            //currentComposer.composition.recompose()
-                            //println(curcom.composition.recompose())
-                            //changeLanguage(appCon , l.code)
-
-                            //}
-
-                            Log.d("DropLang" , AppCompatDelegate.getApplicationLocales().toLanguageTags())
 
                         })
                     }
@@ -170,13 +150,14 @@ fun SettingsScreen(appCon : Context , curcom : Composer){
     }
 }
 
-fun Context.findActivity() : Activity? = when(this){
+
+fun Context.findActivity(): Activity? = when (this) {
     is Activity -> this
     is ContextWrapper -> baseContext.findActivity()
     else -> null
 }
 
-fun changeLanguage( context: Context , language: String ){
+fun changeLanguage(context: Context, language: String) {
     context.findActivity()?.runOnUiThread {
         val appLocale = LocaleListCompat.forLanguageTags(language)
         AppCompatDelegate.setApplicationLocales(appLocale)

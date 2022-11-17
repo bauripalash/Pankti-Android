@@ -6,7 +6,6 @@ import `in`.palashbauri.panktimob.saveToCache
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -133,8 +132,9 @@ private fun showToastError(appCon: Context, msg: String) {
     Toast.makeText(appCon, msg, Toast.LENGTH_LONG).show()
 }
 
+
 fun createFile(appCon: Context, uri: String, data: String) {
-    Log.d("createFILE", uri)
+    //Log.d("createFILE", uri)
     val filePath = Uri.parse(uri)
     try {
 
@@ -147,7 +147,7 @@ fun createFile(appCon: Context, uri: String, data: String) {
         parcelFileDescriptor?.close()
     } catch (e: java.lang.Exception) {
         //e.printStackTrace()
-        showToastError(appCon, "Failed to Save file $uri")
+        showToastError(appCon, appCon.getString(R.string.failed_to_save) + " $uri")
     }
 
 }
@@ -165,7 +165,7 @@ private fun openFile(appCon: Context, uri: String): String? {
         parcelFileDescriptor?.close()
         return output
     } catch (e: Exception) {
-        showToastError(appCon, "Failed to Open File $uri")
+        showToastError(appCon, appCon.getString(R.string.failed_to_open) + " $uri")
     }
 
     return null
@@ -203,7 +203,7 @@ fun EditorWriteScreen(navController: NavHostController) {
         try {
             aLauncher.launch("source.pank")
         } catch (e: Exception) {
-            showToastError(thisContext, "Failed to save File")
+            showToastError(thisContext, thisContext.getString(R.string.failed_to_save))
         }
     }
 
@@ -211,7 +211,7 @@ fun EditorWriteScreen(navController: NavHostController) {
         rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) {
             //println(it.toString())
             val inpFileValue = openFile(thisContext, it.toString())
-            Log.w("Launcher", inpFileValue.toString())
+            //Log.w("Launcher", inpFileValue.toString())
             if (inpFileValue != null) {
                 inputValue = inpFileValue.toString()
             }
