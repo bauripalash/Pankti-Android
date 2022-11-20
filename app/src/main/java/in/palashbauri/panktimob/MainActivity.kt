@@ -25,11 +25,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val lang = AppCompatDelegate.getApplicationLocales().get(0)?.toLanguageTag()
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(lang))
-        val shouldBeDark = GetBoolPref(this , getString(R.string.darkPref))
-        if (shouldBeDark){
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }else{
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        when (GetIntPref(this, getString(R.string.darkPref))) {
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            )
+            AppCompatDelegate.MODE_NIGHT_YES -> AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_YES
+            )
+            AppCompatDelegate.MODE_NIGHT_NO -> AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_NO
+            )
+            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
 
         setContent {
@@ -62,11 +68,11 @@ fun Context.findActivity(): Activity? = when (this) {
     else -> null
 }
 
-fun SetBoolPref(context: Context , key : String , value : Boolean){
+fun SetPref(context: Context, key: String, value: Boolean) {
     context.findActivity()?.runOnUiThread {
         val sharedPreferences = context.findActivity()?.getPreferences(Context.MODE_PRIVATE)
         if (sharedPreferences != null) {
-            with (sharedPreferences.edit()){
+            with(sharedPreferences.edit()) {
                 putBoolean(key, value)
                 apply()
             }
@@ -74,13 +80,39 @@ fun SetBoolPref(context: Context , key : String , value : Boolean){
     }
 }
 
-fun GetBoolPref(context: Context , key : String) : Boolean {
-    val sharedPreferences = context.findActivity()?.getPreferences(Context.MODE_PRIVATE)?:return false
+fun SetPref(context: Context, key: String, value: Int) {
+    context.findActivity()?.runOnUiThread {
+        val sharedPreferences = context.findActivity()?.getPreferences(Context.MODE_PRIVATE)
+        if (sharedPreferences != null) {
+            with(sharedPreferences.edit()) {
+                putInt(key, value)
+                apply()
+            }
+        }
+    }
+}
 
-    return sharedPreferences.getBoolean(key , false)
+
+fun GetBoolPref(context: Context, key: String): Boolean {
+    val sharedPreferences =
+        context.findActivity()?.getPreferences(Context.MODE_PRIVATE) ?: return false
+
+    return sharedPreferences.getBoolean(key, false)
 
 }
 
+
+// For Dark Mode
+// 0 => Auto
+// 1 => Dark
+// 2 => Light
+
+fun GetIntPref(context: Context, key: String): Int {
+    val sharedPreferences = context.findActivity()?.getPreferences(Context.MODE_PRIVATE) ?: return 0
+
+    return sharedPreferences.getInt(key, 0)
+
+}
 
 
 @OptIn(ExperimentalMaterial3Api::class)

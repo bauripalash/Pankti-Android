@@ -2,11 +2,7 @@ package `in`.palashbauri.panktimob.views
 
 import `in`.palashbauri.panktimob.*
 import `in`.palashbauri.panktimob.R
-import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
-import android.util.Log
-import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -72,6 +68,15 @@ private fun isNightMode() = when (AppCompatDelegate.getDefaultNightMode()) {
     else -> isSystemInDarkTheme()
 }
 
+fun getThemeNameFromCode(code: Int): String {
+    return when (code) {
+        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> "Auto"
+        AppCompatDelegate.MODE_NIGHT_YES -> "Dark"
+        AppCompatDelegate.MODE_NIGHT_NO -> "Light"
+        else -> "Auto"
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
@@ -80,9 +85,22 @@ fun SettingsScreen(appCon: Context, navController: NavController) {
     val bengaliLang = mapOf("name" to stringResource(id = R.string.bengali), "code" to "bn")
     val englishLang = mapOf("name" to stringResource(id = R.string.english), "code" to "en")
 
+    val autoTheme = mapOf("name" to stringResource(id = R.string.theme_auto), "code" to AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+    val darkTheme = mapOf("name" to stringResource(id = R.string.theme_dark), "code" to AppCompatDelegate.MODE_NIGHT_YES)
+    val lightTheme = mapOf("name" to stringResource(id = R.string.theme_light), "code" to AppCompatDelegate.MODE_NIGHT_NO)
+
+    val currentTheme = AppCompatDelegate.getDefaultNightMode()
+
+
     val langs = listOf(
         bengaliLang,
         englishLang
+    )
+
+    val themes = listOf(
+        autoTheme,
+        darkTheme,
+        lightTheme
     )
 
 
@@ -90,12 +108,24 @@ fun SettingsScreen(appCon: Context, navController: NavController) {
         mutableStateOf(false)
     }
 
+    var themeExpanded by remember {
+        mutableStateOf(false)
+    }
+
     var selLang by remember {
-        mutableStateOf("")
+        mutableStateOf(AppCompatDelegate.getApplicationLocales()[0]?.toLanguageTag() ?: "en")
     }
 
     var selLangName by remember {
-        mutableStateOf(AppCompatDelegate.getApplicationLocales()[0]?.displayName ?: "")
+        mutableStateOf(AppCompatDelegate.getApplicationLocales()[0]?.displayName ?: "English")
+    }
+
+    var selTheme by remember {
+        mutableStateOf(currentTheme)
+    }
+
+    var selThemeName by remember {
+        mutableStateOf(getThemeNameFromCode(currentTheme))
     }
 
 
@@ -104,28 +134,20 @@ fun SettingsScreen(appCon: Context, navController: NavController) {
     }
 
 
-
-
-    var shouldBeDark by remember {
-        mutableStateOf(GetBoolPref(appCon , appCon.getString(R.string.darkPref)))
-    }
-
-    //isDark = GetBoolPref(appCon , appCon.getString(R.string.darkPref))
-
-
-
-
-
-
     Column(modifier = Modifier.fillMaxSize()) {
 
         SettingsTopMenu(navController) {
 
-            Log.i("Dark" , shouldBeDark.toString())
-            changeSettings(appCon , shouldBeDark , selLang)
+            changeSettings(appCon, selTheme, selLang)
 
         }
+
+
+
         Spacer(modifier = Modifier.size(5.dp))
+
+
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -147,7 +169,7 @@ fun SettingsScreen(appCon: Context, navController: NavController) {
                             // the DropDown the same width
                             tFSize = coordinates.size.toSize()
                         },
-                    label = { AppCompatDelegate.getApplicationLocales()[0]?.let { Text(it.displayName) } },
+                    label = { stringResource(id = R.string.language) },
                     trailingIcon = {
                         Icon(Icons.Default.ArrowDropDown, "contentDescription",
                             Modifier.clickable { expanded = !expanded })
@@ -171,21 +193,50 @@ fun SettingsScreen(appCon: Context, navController: NavController) {
                 }
             }
         }
-
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(15.dp),
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center){
-            Text(text = "Dark Mode" , modifier = Modifier.weight(0.5F))
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(text = stringResource(id = R.string.theme), modifier = Modifier.weight(0.5F))
+            Row(modifier = Modifier.weight(0.5F)) {
+                //Text(text = "Dark Mode" , modifier = Modifier.weight(0.5F))
 
-            Switch(modifier = Modifier.weight(0.5F),
-                checked = shouldBeDark, onCheckedChange = {
+                OutlinedTextField(
+                    value = selThemeName,
+                    onValueChange = { selThemeName = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onGloballyPositioned { coordinates ->
+                            // This value is used to assign to
+                            // the DropDown the same width
+                            tFSize = coordinates.size.toSize()
+                        },
+                    label = { stringResource(id = R.string.theme) },
+                    trailingIcon = {
+                        Icon(Icons.Default.ArrowDropDown, "contentDescription",
+                            Modifier.clickable { themeExpanded = !themeExpanded })
+                    }
+                )
+
+                DropdownMenu(expanded = themeExpanded,
+                    modifier = Modifier.width(with(LocalDensity.current) { tFSize.width.toDp() }),
+                    onDismissRequest = { themeExpanded = false }) {
+                    themes.forEach { l ->
+                        DropdownMenuItem(text = {
+                            Text(text = l["name"].toString())
+                        }, onClick = {
+                            themeExpanded = false
+                            selTheme = l["code"] as Int
+                            selThemeName = l["name"].toString()
 
 
-                shouldBeDark =  !shouldBeDark
-
-            })
+                        })
+                    }
+                }
+            }
         }
 
         ////
@@ -193,42 +244,13 @@ fun SettingsScreen(appCon: Context, navController: NavController) {
 }
 
 
-
-
-fun changeDarkMode( context: Context ,toDark : Boolean){
-
-    context.findActivity()?.runOnUiThread {
-        SetBoolPref(
-            context,
-            context.getString(R.string.darkPref),
-            toDark
-        )
-    }
-    context.findActivity()?.recreate()
-}
-
-fun changeSettings(context: Context , toDark: Boolean , language: String){
+fun changeSettings(context: Context, theme: Int, language: String) {
     context.findActivity()?.runOnUiThread {
         val appLocale = LocaleListCompat.forLanguageTags(language)
-        SetBoolPref(context , context.getString(R.string.darkPref) , toDark)
-        if (toDark) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        }else{
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
-
+        SetPref(context, context.getString(R.string.darkPref), theme)
+        AppCompatDelegate.setDefaultNightMode(theme)
         AppCompatDelegate.setApplicationLocales(appLocale)
 
     }
-}
-
-fun changeLanguage(context: Context, language: String) {
-    context.findActivity()?.runOnUiThread {
-        val appLocale = LocaleListCompat.forLanguageTags(language)
-        AppCompatDelegate.setApplicationLocales(appLocale)
-        //context.findActivity()?.recreate()
-    }
-
-    //context.findActivity()?.recreate()
 }
 
