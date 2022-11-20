@@ -1,11 +1,15 @@
 package `in`.palashbauri.panktimob.views
 
+import `in`.palashbauri.panktimob.*
 import `in`.palashbauri.panktimob.R
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.util.Log
+import android.widget.ToggleButton
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -61,6 +65,13 @@ fun SsPreview() {
     SettingsScreen(appCon = LocalContext.current, tempNavController)
 }
 
+@Composable
+private fun isNightMode() = when (AppCompatDelegate.getDefaultNightMode()) {
+    AppCompatDelegate.MODE_NIGHT_NO -> false
+    AppCompatDelegate.MODE_NIGHT_YES -> true
+    else -> isSystemInDarkTheme()
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
@@ -94,10 +105,25 @@ fun SettingsScreen(appCon: Context, navController: NavController) {
 
 
 
+
+    var shouldBeDark by remember {
+        mutableStateOf(GetBoolPref(appCon , appCon.getString(R.string.darkPref)))
+    }
+
+    //isDark = GetBoolPref(appCon , appCon.getString(R.string.darkPref))
+
+
+
+
+
+
     Column(modifier = Modifier.fillMaxSize()) {
 
         SettingsTopMenu(navController) {
-            changeLanguage(appCon, selLang)
+
+            Log.i("Dark" , shouldBeDark.toString())
+            changeSettings(appCon , shouldBeDark , selLang)
+
         }
         Spacer(modifier = Modifier.size(5.dp))
         Row(
@@ -146,15 +172,54 @@ fun SettingsScreen(appCon: Context, navController: NavController) {
             }
         }
 
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center){
+            Text(text = "Dark Mode" , modifier = Modifier.weight(0.5F))
+
+            Switch(modifier = Modifier.weight(0.5F),
+                checked = shouldBeDark, onCheckedChange = {
+
+
+                shouldBeDark =  !shouldBeDark
+
+            })
+        }
+
         ////
     }
 }
 
 
-fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
+
+
+fun changeDarkMode( context: Context ,toDark : Boolean){
+
+    context.findActivity()?.runOnUiThread {
+        SetBoolPref(
+            context,
+            context.getString(R.string.darkPref),
+            toDark
+        )
+    }
+    context.findActivity()?.recreate()
+}
+
+fun changeSettings(context: Context , toDark: Boolean , language: String){
+    context.findActivity()?.runOnUiThread {
+        val appLocale = LocaleListCompat.forLanguageTags(language)
+        SetBoolPref(context , context.getString(R.string.darkPref) , toDark)
+        if (toDark) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        }else{
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+
+        AppCompatDelegate.setApplicationLocales(appLocale)
+
+    }
 }
 
 fun changeLanguage(context: Context, language: String) {
